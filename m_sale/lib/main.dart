@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:m_sale/menu_bar.dart';
+import 'package:m_sale/profile.dart';
+import 'package:m_sale/profile_post.dart';
+import 'package:m_sale/test.dart';
+
 
 import 'home.dart';
+import 'more.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
 //        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: home(),
+      home: profile(),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,72 @@ class home extends StatefulWidget {
   _homeState createState() => _homeState();
 }
 
-class _homeState extends State<home> {
+class _homeState extends State<home> with SingleTickerProviderStateMixin {
+  int _currentIndex = 0;
+  List cardList = [
+    Image(
+      image: AssetImage('images/assets/announ.jpg'),
+      fit: BoxFit.cover,
+    ),
+    Image(image: AssetImage('images/assets/announce1.jpg'), fit: BoxFit.cover),
+    Image(
+        image: AssetImage('images/assets/announcement.jfif'),
+        fit: BoxFit.cover),
+    Image(image: AssetImage('images/assets/imp.jpg'), fit: BoxFit.cover),
+  ];
+  List<T> map<T>(List list, Function handler) {
+    List<T> result = [];
+    for (var i = 0; i < list.length; i++) {
+      result.add(handler(i, list[i]));
+    }
+    return result;
+  }
+
+  final List<Tab> tabs = <Tab>[
+    Tab(
+      text: 'ALL',
+    ),
+    Tab(
+      text: 'iPhone',
+    ),
+    Tab(
+      text: 'SAMSUNG',
+    ),
+    Tab(
+      text: 'VIVO',
+    ),
+    Tab(
+      text: 'OPPO',
+    ),
+    Tab(
+      text: 'OPPO',
+    ),
+    Tab(
+      text: 'OPPO',
+    ),
+    Tab(
+      text: 'OPPO',
+    ),
+    Tab(
+      text: 'OPPO',
+    ),
+  ];
+  TabController _tabController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _tabController = new TabController(length: tabs.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _tabController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,17 +92,14 @@ class _homeState extends State<home> {
               color: Color(0xff1A94A7)),
         ),
         actions: <Widget>[
-//          SvgPicture.asset("images/icon/filter.svg", color: Color(0xff1A94A7),),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: IconButton(
-              icon: Icon(
-                Icons.filter,
-                size: 30,
-                color: Color(0xff1A94A7),
-              ),
-              onPressed: null,
-            ),
+          Container(
+              margin: EdgeInsets.only(right: 20),
+              child: SvgPicture.asset("images/icon/filter.svg",
+                  width: 25, height: 28, color: Color(0xff1A94A7))),
+          Icon(
+            Icons.search,
+            color: Color(0xff1A94A7),
+            size: 35,
           ),
         ],
       ),
@@ -44,59 +107,72 @@ class _homeState extends State<home> {
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.all(20),
-              child: Material(
-                elevation: 15.0,
-                shadowColor: Colors.lightBlue.withOpacity(0.1),
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                child: TextField(
-                  autocorrect: true,
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    hintStyle: TextStyle(color: Color(0xffB1B1B1)),
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(color: Colors.transparent),
-                    ),
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               color: Colors.white,
               child: Column(
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
-                    child: Text("Announcement", style: TextStyle(
-                      color: Color(0xff1A94A7), fontSize: 45,),),
+                    child: Text(
+                      "Announcement",
+                      style: TextStyle(
+                        color: Color(0xff1A94A7),
+                        fontSize: 45,
+                      ),
+                    ),
                   ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: Image.asset(
-                          'images/assets/announ.jpg', width: MediaQuery
-                            .of(context)
-                            .size
-                            .width / 1.1,)),
+                  CarouselSlider(
+                    height: 200.0,
+                    autoPlay: true,
+                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    pauseAutoPlayOnTouch: Duration(seconds: 10),
+                    aspectRatio: 2.0,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    items: cardList.map((card) {
+                      return Builder(builder: (BuildContext context) {
+                        return Container(
+                          height: MediaQuery.of(context).size.height * 0.30,
+                          width: MediaQuery.of(context).size.width,
+                          child: Card(
+                            color: Colors.blueAccent,
+                            child: card,
+                          ),
+                        );
+                      });
+                    }).toList(),
                   ),
-                ],),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: map<Widget>(cardList, (index, url) {
+                      return Container(
+                        width: 5.0,
+                        height: 5.0,
+                        margin: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentIndex == index
+                              ? Color(0xff1A94A7)
+                              : Colors.grey,
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
             ),
-
             Container(
               margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               color: Colors.white,
               child: Column(
                 children: <Widget>[
@@ -104,57 +180,65 @@ class _homeState extends State<home> {
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.only(left: 20.0),
-                        child: Text("New Offers",
-                          style: TextStyle(color: Color(0xff1A94A7), fontSize: 45,),),
+                        child: Text(
+                          "New Offers",
+                          style: TextStyle(
+                            color: Color(0xff1A94A7),
+                            fontSize: 45,
+                          ),
+                        ),
                       ),
                       Container(
                           margin: EdgeInsets.fromLTRB(80, 0, 20, 0),
-                          child: Text("View All", style: TextStyle(fontSize: 20,
-                              color: Color(0xffB1B1B1),
-                              fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.right,)),
+                          child: Text(
+                            "View All",
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Color(0xffB1B1B1),
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.right,
+                          )),
                     ],
                   ),
-//                  Expanded(child: ListView.builder(
-//                      shrinkWrap: true,
-//                      scrollDirection: Axis.horizontal,
-//                      itemCount: 5,
-//                      itemBuilder: (BuildContext context, int index) => Card(
-//                        child: Center(
-//                          child:product(),
-//                        ),
-//                      )),),
-                  product(),
-                ],),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 20.0),
+                    height: 345.0,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        product('images/assets/phone.jpg'),
+                        product('images/assets/phone.jpg'),
+                        product('images/assets/phone.jpg'),
+                        product('images/assets/phone.jpg'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               color: Colors.white,
               child: Column(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Text('ALL',style: TextStyle(fontSize: 25,color: Colors.grey),),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Text('SUMSUNG',style: TextStyle(fontSize: 25,color: Colors.grey),),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Text('APPLE',style: TextStyle(fontSize: 25,color: Colors.grey),),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Text('OPPO',style: TextStyle(fontSize: 25,color: Colors.grey),),
-                      ),
-                    ],
+                  Container(
+                    height: 66,
+                    padding: EdgeInsets.all(8),
+                    child: TabBar(
+                      isScrollable: true,
+                      unselectedLabelColor: Colors.grey,
+                      labelColor: Color(0xff1A94A7),
+                      labelStyle: TextStyle(fontSize: 17),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                              color: Color(0xff1A94A7),
+                              style: BorderStyle.solid,
+                              width: 2)),
+                      tabs: tabs,
+                      controller: _tabController,
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
@@ -162,41 +246,39 @@ class _homeState extends State<home> {
                       children: <Widget>[
                         Row(
                           children: <Widget>[
-                            product(),
-                            product(),
+                            product('images/assets/phone.jpg'),
+                            product('images/assets/phone.jpg'),
                           ],
                         ),
                         Row(
                           children: <Widget>[
-                            product(),
-                            product(),
+                            product('images/assets/phone.jpg'),
+                            product('images/assets/phone.jpg'),
                           ],
                         ),
                         Row(
                           children: <Widget>[
-                            product(),
-                            product(),
+                            product('images/assets/phone.jpg'),
+                            product('images/assets/phone.jpg'),
                           ],
                         ),
                       ],
                     ),
                   ),
-                ],),
+                ],
+              ),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: BottomBarCustom(),
     );
   }
 
-
-  Widget product() {
+  Widget product(String image) {
     return Container(
       margin: EdgeInsets.fromLTRB(5, 10, 5, 10),
-      width: MediaQuery
-          .of(context)
-          .size
-          .width / 2.1,
+      width: MediaQuery.of(context).size.width / 2.1,
 //                      height: 250,
       decoration: BoxDecoration(
         boxShadow: [
@@ -211,49 +293,76 @@ class _homeState extends State<home> {
       child: Container(
         color: Colors.white,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundImage: AssetImage(
-                      'images/assets/announce1.jpg'), minRadius: 15,),
-                Container(
-                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0,),
-                  child: Column(
-                    children: <Widget>[
-                      Text('David Shop Phone', style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold),),
-                      Text('2w ago', style: TextStyle(
-                          fontSize: 10, color: Colors.grey),),
-                    ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 0, 0,),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundImage: AssetImage('images/assets/announce1.jpg'),
+                    minRadius: 15,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Icon(Icons.favorite_border),
-                ),
-              ],
+                  Container(
+                    margin: EdgeInsets.fromLTRB(
+                      10,
+                      0,
+                      10,
+                      0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'David Shop Phone',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '2w ago',
+                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Icon(Icons.favorite_border),
+                  ),
+                ],
+              ),
             ),
             Container(
                 margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: Image.asset('images/assets/phone.jpg')),
-            Row(
-              children: <Widget>[
-                Text('iPhone 11Pro', style: TextStyle(
-                    fontSize: 20, color: Color(0xff1A94A7)),),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Text(
-                    "499", style: TextStyle(fontSize: 20, color: Colors
-                      .red),),
-                ),
-              ],
+                child: Image.asset(image)),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    'iPhone 11Pro',
+                    style: TextStyle(fontSize: 20, color: Color(0xff1A94A7)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30),
+                    child: Text(
+                      "499\$",
+                      style: TextStyle(fontSize: 20, color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 170, 10),
-              child: Text('9 Sold', style: TextStyle(fontSize: 12,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.bold),),
+              padding: const EdgeInsets.fromLTRB(8, 8, 0, 0,),
+              child: Text(
+                '9 Sold',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -262,4 +371,60 @@ class _homeState extends State<home> {
   }
 }
 
-
+class BottomBarCustom extends StatelessWidget {
+  const BottomBarCustom({
+    Key key,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(
+              title: Text('home'),
+              icon: Icon(
+                Icons.home,
+                size: 43,
+              )),
+//          BottomNavigationBarItem(title: Text('home'),icon:SvgPicture.asset("images/icon/home-run.svg",width: 35,height: 40,),),
+          BottomNavigationBarItem(
+              title: Text('feature'),
+              icon: Icon(
+                Icons.featured_play_list,
+                size: 40,
+              )),
+          BottomNavigationBarItem(
+              title: Text('add'),
+              icon: Icon(
+                Icons.add_circle,
+                size: 40,
+              )),
+          BottomNavigationBarItem(
+              title: Text('comment'),
+              icon: Icon(
+                Icons.mode_comment,
+                size: 40,
+              )),
+          BottomNavigationBarItem(
+              title: Text('dehaze'),
+              icon: Icon(
+                Icons.dehaze,
+                size: 40,
+              )),
+        ],
+        currentIndex: 0,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        selectedItemColor: Color(0xff1A94A7),
+        unselectedItemColor: Colors.grey,
+      ),
+    );
+  }
+}
